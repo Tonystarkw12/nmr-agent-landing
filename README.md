@@ -14,6 +14,10 @@ NMR Agent 课题产品宣传页的源仓库。
 | `GraphPulse宣传视频.mp4` | 宣传视频主文件（18MB） |
 | `media/graphpulse-promo.mp4` | 压缩版宣传视频（3.5MB） |
 | `media/graphpulse-poster.jpg` | 视频封面图 |
+| `NMRagent宣传视频.mp4` | NMRagent 宣传视频主文件（6MB） |
+| `nmrsim-py宣传视频.mp4` | nmrsimpy 宣传视频主文件（7MB） |
+| `media/nmragent-promo.mp4` / `media/nmragent-poster.jpg` | NMRagent 部署版视频与封面 |
+| `media/nmrsim-py-promo.mp4` / `media/nmrsim-py-poster.jpg` | nmrsimpy 部署版视频与封面 |
 
 ## 工作流
 

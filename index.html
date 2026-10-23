@@ -313,6 +313,17 @@
                     <p data-i18n="mode.3.d">上传示意图，识别时序与参数后生成代码</p>
                 </a>
             </div>
+            <div class="head rv" style="margin: 64px 0 32px">
+                <h2 style="font-size: 1.8rem" data-i18n="ag.film.head">演示视频</h2>
+                <p data-i18n="ag.film.sub">57 秒看完：从一句话到可导入 TopSpin 的脉冲程序</p>
+            </div>
+            <figure class="film rv">
+                <video controls preload="none" playsinline poster="media/nmragent-poster.jpg" width="1280" height="720">
+                    <source src="media/nmragent-promo.mp4" type="video/mp4">
+                    <p data-i18n="ag.film.nofilm">你的浏览器不支持视频播放。<a href="media/nmragent-promo.mp4">直接下载视频</a>。</p>
+                </video>
+                <figcaption data-i18n="ag.film.cap">NMRagent 宣传片 · 自然语言交互、三核混合检索、两层严苛校验与反射式自愈闭环</figcaption>
+            </figure>
         </div>
     </section>
 
@@ -349,6 +360,15 @@
 <span class="p">$</span> nmrsimpy batch /path/to/datasets \
     --out-dir results/ --limit 50</pre>
             </div>
+        </div>
+        <div class="container" style="margin-top: 72px">
+            <figure class="film rv">
+                <video controls preload="none" playsinline poster="media/nmrsim-py-poster.jpg" width="1280" height="720">
+                    <source src="media/nmrsim-py-promo.mp4" type="video/mp4">
+                    <p data-i18n="sim.film.nofilm">你的浏览器不支持视频播放。<a href="media/nmrsim-py-promo.mp4">直接下载视频</a>。</p>
+                </video>
+                <figcaption data-i18n="sim.film.cap">nmrsimpy 宣传片 · 纯 Python 无头运行、全哈密顿量子自旋演化、与 NMRSIM 内核报错逐字节镜像</figcaption>
+            </figure>
         </div>
     </section>
 
@@ -505,6 +525,10 @@
             'mode.1.t': 'Natural Language Input', 'mode.1.d': 'For example: "Generate a spin echo sequence, TE=100ms"',
             'mode.2.t': 'Upload TXT File', 'mode.2.d': 'Upload a parameter file to parse and generate a pulse sequence',
             'mode.3.t': 'Upload Pulse Image', 'mode.3.d': 'Upload a diagram; timing and parameters are recognized and turned into code',
+            'ag.film.head': 'Demo Video',
+            'ag.film.sub': '57 seconds: from a one-line experiment description to a TopSpin-ready pulse program',
+            'ag.film.cap': 'NMRagent trailer: natural-language interaction, tri-core hybrid retrieval, two-layer validation and the reflective self-healing loop',
+            'ag.film.nofilm': 'Your browser cannot play this video. <a href="media/nmragent-promo.mp4">Download it instead</a>.',
             'sim.title': '<em>nmrsimpy</em>: pulse-program simulation in Python',
             'sim.desc': 'Reads a Bruker pulse program (.pp) and a spin system (.ham), evolves the density matrix and synthesizes the FID, with no TopSpin session needed. For most experiment families the FID matches NMRSIM output with cosine similarity of at least 0.99.',
             'sim.1': 'Runs real .pp files: 761 of 808 corpus files parse',
@@ -514,6 +538,8 @@
             'sim.5': 'Compile-time error checks aligned with NMRSIM kernel messages',
             'sim.6': 'Light dependencies: numpy and bruker-lark, Python 3.10+',
             'sim.note': 'Known limits: no more than 11 spins, no CW or chirp pulses, relaxation during pulses is not modeled.',
+            'sim.film.cap': 'nmrsimpy trailer: headless pure-Python runs, full-Hamiltonian quantum spin evolution, and byte-for-byte alignment with NMRSIM kernel errors',
+            'sim.film.nofilm': 'Your browser cannot play this video. <a href="media/nmrsim-py-promo.mp4">Download it instead</a>.',
             'gp.title': '<em>GraphPulse</em>: pulse programs you can see',
             'gp.desc': 'Renders Bruker .pp files as TopSpin-style lane timing diagrams and keeps them in sync with the source. View, edit and export in the browser.',
             'gp.1': 'Lane view: f1, f2, grad, delay, acq, meta, with aligned pulses shown together',
