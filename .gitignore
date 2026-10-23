@@ -1,0 +1,35 @@
+# Agent local state & editor configs
+.agents/
+.claude/
+.codex/
+.commandcode/
+.cursor/
+.vscode/
+.idea/
+.mcp.json
+mempalace.yaml
+entities.json
+headroom_memory.db
+
+# Tool indexers, caches, and graph databases
+.zvec-grep/
+.repowise/
+.deepeval/
+.mimocode/
+.gitnexus/
+.omx/
+.codegraph/
+.code-review-graph/
+.tgrep/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Local scratch
+*.log
+*.pid
+*.status

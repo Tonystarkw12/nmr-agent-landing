@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="page.title">NMR Agent - AI 驱动的 NMR 脉冲序列工具链</title>
+    <meta name="description" data-i18n="page.desc" content="用自然语言生成 Bruker TopSpin 脉冲程序，配套物理仿真校验与可视化，让 NMR 科研更高效">
+    <script>
+        (function () {
+            const d = document.documentElement;
+            d.classList.add('js');
+            let t = localStorage.getItem('nmr-agent-theme');
+            if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            d.dataset.theme = t;
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a1018;
+            --panel: #101a2b;
+            --line: rgba(255, 255, 255, 0.08);
+            --text: #e8ecf2;
+            --mute: #8b99ad;
+            --blue: #7fa8d9;
+            --blue2: #a9c4e4;
+            --gold: #d4b06a;
+            --g: linear-gradient(135deg, #7fa8d9 0%, #a9c4e4 100%);
+            --gg: linear-gradient(135deg, #7fa8d9 0%, #d4b06a 100%);
+            --r: 16px;
+            --nav: rgba(10, 16, 24, 0.8);
+            --soft: rgba(255, 255, 255, 0.07);
+            --soft2: rgba(255, 255, 255, 0.12);
+            --line2: rgba(255, 255, 255, 0.18);
+            --alt: rgba(255, 255, 255, 0.02);
+            --grid: rgba(255, 255, 255, 0.025);
+            --glow1: rgba(127, 168, 217, 0.14);
+            --glow2: rgba(212, 176, 106, 0.07);
+            color-scheme: dark;
+        }
+        [data-theme="light"] {
+            --bg: #f5f7fb; --panel: #ffffff; --line: rgba(15, 27, 45, 0.12);
+            --text: #0f1b2d; --mute: #52627a;
+            --blue: #3f6fa8; --blue2: #2f5a8f; --gold: #7a5810;
+            --gg: linear-gradient(135deg, #3f6fa8 0%, #7a5810 100%);
+            --nav: rgba(245, 247, 251, 0.85); --soft: rgba(15, 27, 45, 0.05); --soft2: rgba(15, 27, 45, 0.1); --line2: rgba(15, 27, 45, 0.2);
+            --alt: rgba(15, 27, 45, 0.03); --grid: rgba(15, 27, 45, 0.045);
+            --glow1: rgba(127, 168, 217, 0.28); --glow2: rgba(212, 176, 106, 0.16);
+            color-scheme: light;
+        }
+        /* 终端与时序图在两种主题下都保持深色 */
+        .term, .viz { --blue: #7fa8d9; --blue2: #a9c4e4; --gold: #d4b06a; --mute: #8b99ad; --text: #e8ecf2; --line: rgba(255, 255, 255, 0.08); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+        body { font: 16px/1.6 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background: radial-gradient(ellipse 60% 40% at 15% 0%, var(--glow1), transparent),
+                        radial-gradient(ellipse 50% 40% at 90% 35%, var(--glow2), transparent),
+                        linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 48px 48px,
+                        linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 48px 48px; }
+        h1, h2, h3, h4 { font-family: Georgia, 'Times New Roman', 'Songti SC', 'STSong', 'Noto Serif SC', serif; line-height: 1.25; }
+        em { font-style: normal; background: var(--gg); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        a { color: inherit; }
+        :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+        .container { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+        section { padding: 96px 0; }
+        .alt { background: var(--alt); border-block: 1px solid var(--line); }
+        .head { text-align: center; margin-bottom: 56px; }
+        .head h2 { font-size: 2.4rem; margin-bottom: 12px; }
+        .head p { color: var(--mute); font-size: 1.1rem; }
+
+        /* 导航 */
+        nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px); background: var(--nav); border-bottom: 1px solid var(--line); }
+        .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 68px; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.25rem; text-decoration: none; }
+        .logo svg { width: 32px; height: 32px; }
+        .links { display: flex; gap: 28px; list-style: none; }
+        .links a { color: var(--mute); text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
+        .links a:hover { color: var(--text); }
+        .right { display: flex; align-items: center; gap: 12px; }
+        .lang { background: var(--soft); border: 1px solid var(--line); color: var(--text); padding: 8px 14px; border-radius: 8px; cursor: pointer; font: inherit; font-size: 0.9rem; transition: border-color 0.2s; }
+        .lang:hover { border-color: var(--blue2); }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; border: 1px solid transparent; transition: transform 0.2s, box-shadow 0.2s, background 0.2s; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-p { background: var(--g); color: #0a1018; }
+        .btn-p:hover { box-shadow: 0 10px 30px rgba(127, 168, 217, 0.3); }
+        .btn-s { background: var(--soft); border-color: var(--line2); }
+        .btn-s:hover { background: var(--soft2); }
+        .btn-lg { padding: 15px 30px; font-size: 1.05rem; }
+
+        /* Hero */
+        .hero { padding: 88px 0 72px; text-align: center; }
+        .badge { display: inline-block; padding: 6px 16px; border-radius: 999px; font-size: 0.85rem; color: var(--blue2); background: rgba(127, 168, 217, 0.12); border: 1px solid rgba(127, 168, 217, 0.25); margin-bottom: 24px; }
+        .hero h1 { font-size: clamp(2.3rem, 5.5vw, 3.8rem); margin-bottom: 22px; }
+        .hero p.lead { color: var(--mute); font-size: 1.15rem; max-width: 720px; margin: 0 auto 36px; }
+        .cta-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .spec { margin: 56px auto 0; max-width: 900px; }
+        .spec svg { width: 100%; height: auto; display: block; }
+        .spec .fid { fill: none; stroke: var(--gold); stroke-width: 1.5; opacity: 0.85; }
+        .spec .peak { fill: none; stroke: var(--blue); stroke-width: 2; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 2.6s 0.3s ease-out forwards; }
+        .spec .axis { stroke: var(--line); }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        .stats { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-top: 48px; }
+        .stats li { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; color: var(--mute); font-size: 0.9rem; }
+        .stats b { display: block; font: 700 1.9rem Georgia, serif; color: var(--blue2); }
+
+        /* 卡片 */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 28px; position: relative; overflow: hidden; transition: transform 0.25s, border-color 0.25s; }
+        .card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--g); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
+        .card:hover { transform: translateY(-4px); border-color: rgba(127, 168, 217, 0.35); }
+        .card:hover::before { transform: scaleX(1); }
+        .card h3 { font-size: 1.25rem; margin-bottom: 10px; }
+        .card p { color: var(--mute); }
+        a.card { text-decoration: none; display: block; }
+        .tag { display: inline-block; font: 500 0.75rem 'JetBrains Mono', monospace; color: var(--gold); letter-spacing: 0.08em; margin-bottom: 14px; }
+        .more { display: inline-block; margin-top: 16px; color: var(--blue2); font-weight: 600; font-size: 0.95rem; }
+        /* 分栏 */
+        .split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+        .split h2 { font-size: 2.2rem; margin-bottom: 14px; }
+        .split > div > p { color: var(--mute); margin-bottom: 22px; }
+        .ticks { list-style: none; display: grid; gap: 12px; }
+        .ticks li { padding-left: 28px; position: relative; color: var(--text); }
+        .ticks li::before { content: ''; position: absolute; left: 0; top: 0.5em; width: 14px; height: 8px; border-left: 2px solid var(--gold); border-bottom: 2px solid var(--gold); transform: rotate(-45deg) translateY(-50%); }
+        .note { margin-top: 20px; font-size: 0.85rem; color: var(--mute); }
+        .term { background: #070c14; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35); }
+        .term-bar { display: flex; gap: 7px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+        .term-bar i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); }
+        .term pre { padding: 20px; font: 400 0.85rem/1.8 'JetBrains Mono', monospace; color: var(--blue2); overflow-x: auto; }
+        .term .c { color: var(--mute); }
+        .term .p { color: var(--gold); }
+        .viz { background: #070c14; border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35); }
+        .viz svg { width: 100%; height: auto; display: block; }
+        .viz text { font: 500 11px 'JetBrains Mono', monospace; fill: var(--mute); }
+        .viz .base { stroke: var(--line); }
+        .viz .pl { fill: rgba(127, 168, 217, 0.25); stroke: var(--blue); }
+        .viz .gr { fill: rgba(212, 176, 106, 0.25); stroke: var(--gold); }
+        .viz .hl { fill: rgba(212, 176, 106, 0.1); stroke: var(--gold); stroke-dasharray: 3 3; animation: blink 2.4s ease-in-out infinite; }
+        .viz .acq { fill: none; stroke: var(--blue2); stroke-width: 1.5; }
+        @keyframes blink { 50% { opacity: 0.2; } }
+
+        /* 模型 */
+        .host { display: flex; align-items: center; gap: 16px; }
+        .host svg { width: 44px; height: 44px; flex: none; }
+        .host b { font: 700 1.3rem Georgia, serif; display: block; }
+        .host span { color: var(--mute); font-size: 0.9rem; }
+
+        /* 宣传片 */
+        .film { margin: 0; }
+        .film video { width: 100%; height: auto; display: block; border-radius: var(--r); border: 1px solid var(--line); background: #070c14; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); }
+        .film figcaption { margin-top: 14px; text-align: center; color: var(--mute); font-size: 0.9rem; }
+
+        /* CTA & 页脚 */
+        .cta-box { background: var(--g); color: #0a1018; border-radius: 24px; padding: 64px 32px; text-align: center; }
+        .cta-box h2 { font-size: 2.3rem; margin-bottom: 14px; }
+        .cta-box p { max-width: 640px; margin: 0 auto 28px; opacity: 0.85; font-size: 1.1rem; }
+        .cta-box .btn { background: #0a1018; color: #e8ecf2; }
+        footer { padding: 56px 0 28px; border-top: 1px solid var(--line); }
+        .cols { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 36px; }
+        footer h4 { margin-bottom: 14px; font-size: 1rem; }
+        footer ul { list-style: none; display: grid; gap: 8px; }
+        footer li a, footer p { color: var(--mute); text-decoration: none; font-size: 0.92rem; transition: color 0.2s; }
+        footer li a:hover { color: var(--blue2); }
+        .copy { border-top: 1px solid var(--line); padding-top: 24px; text-align: center; color: var(--mute); font-size: 0.85rem; }
+
+        /* 滚动显现 */
+        .js .rv { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .js .rv.in { opacity: 1; transform: none; }
+
+        @media (max-width: 860px) {
+            section { padding: 64px 0; }
+            .links { display: none; }
+            .split, .cols { grid-template-columns: 1fr; }
+            .head h2, .split h2, .cta-box h2 { font-size: 1.8rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+            .spec .peak { stroke-dashoffset: 0; }
+            .js .rv { opacity: 1; transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container bar">
+            <a class="logo" href="#top" aria-label="NMR Agent">
+                <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#16233a"/><path d="M3 16 Q6 4 9 16 T15 16 T20 16 T24 16 T29 16" fill="none" stroke="#7fa8d9" stroke-width="2" stroke-linecap="round"/></svg>
+                <span>NMR Agent</span>
+            </a>
+            <ul class="links">
+                <li><a href="#products" data-i18n="nav.products">产品</a></li>
+                <li><a href="#nmragent">NMRagent</a></li>
+                <li><a href="#nmrsim">nmrsimpy</a></li>
+                <li><a href="#graphpulse">GraphPulse</a></li>
+                <li><a href="#models" data-i18n="nav.models">模型与数据</a></li>
+            </ul>
+            <div class="right">
+                <button class="lang" id="theme" type="button" aria-label="Toggle light/dark theme">◐</button>
+                <button class="lang" id="lang" type="button" aria-label="Switch language">EN</button>
+                <a class="btn btn-p" href="https://nmragent.201014.xyz" data-i18n="nav.try">立即体验</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero" id="top">
+        <div class="container">
+            <span class="badge" data-i18n="hero.badge">AI 驱动的 NMR 脉冲序列工具链</span>
+            <h1 data-i18n="hero.title">用 <em>自然语言</em> 生成<br>可验证的 NMR 脉冲序列</h1>
+            <p class="lead" data-i18n="hero.desc">NMRagent 把实验描述转成 Bruker TopSpin 脉冲程序；nmrsimpy 用物理仿真校验结果；GraphPulse 把脉冲程序画成 TopSpin 风格时序图。从一句话到可视化、可验证的 .pp 文件。</p>
+            <div class="cta-row">
+                <a class="btn btn-p btn-lg" href="https://nmragent.201014.xyz" data-i18n="hero.start">开始使用</a>
+                <a class="btn btn-s btn-lg" href="#products" data-i18n="hero.more">了解更多</a>
+            </div>
+            <div class="spec" aria-hidden="true">
+                <svg viewBox="0 0 900 240">
+                    <path id="fid" class="fid"/>
+                    <line class="axis" x1="0" y1="215" x2="900" y2="215"/>
+                    <path id="sp" class="peak" pathLength="1"/>
+                </svg>
+            </div>
+            <ul class="stats">
+                <li data-i18n="stat.1"><b>2 层</b>语法 + 物理仿真校验</li>
+                <li data-i18n="stat.2"><b>4 种</b>仿真后端对比</li>
+                <li data-i18n="stat.3"><b>26 个</b>内置示例脉冲程序</li>
+                <li data-i18n="stat.4"><b>12 类</b>实验族覆盖</li>
+            </ul>
+        </div>
+    </header>
+
+    <section id="products" class="alt">
+        <div class="container">
+            <div class="head rv">
+                <h2 data-i18n="prod.title">三个工具，<em>一条工作流</em></h2>
+                <p data-i18n="prod.sub">从一句话需求，到经过仿真验证、可检查的脉冲程序</p>
+            </div>
+            <div class="grid">
+                <a class="card rv" href="#nmragent">
+                    <span class="tag" data-i18n="prod.1.tag">01 · 生成</span>
+                    <h3>NMRagent</h3>
+                    <p data-i18n="prod.1.desc">检索增强的 LLM 智能体，把自然语言需求生成为 Bruker TopSpin 脉冲程序，并自动校验、重试。</p>
+                    <span class="more" data-i18n="prod.more">了解详情 →</span>
+                </a>
+                <a class="card rv" href="#nmrsim">
+                    <span class="tag" data-i18n="prod.2.tag">02 · 仿真</span>
+                    <h3>nmrsimpy</h3>
+                    <p data-i18n="prod.2.desc">纯 Python 的无界面脉冲程序仿真引擎：读取 .pp 与自旋体系，演化密度矩阵，输出 FID。</p>
+                    <span class="more" data-i18n="prod.more">了解详情 →</span>
+                </a>
+                <a class="card rv" href="#graphpulse">
+                    <span class="tag" data-i18n="prod.3.tag">03 · 可视化</span>
+                    <h3>GraphPulse</h3>
+                    <p data-i18n="prod.3.desc">TopSpin 风格的脉冲程序查看与编辑器：泳道时序图与源码双向联动，可在线编辑。</p>
+                    <span class="more" data-i18n="prod.more">了解详情 →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="nmragent">
+        <div class="container">
+            <div class="head rv">
+                <h2><em>NMRagent</em> <span data-i18n="ag.title">核心功能</span></h2>
+                <p data-i18n="ag.sub">检索、生成、校验、重试：输出可直接导入 TopSpin 的脉冲程序</p>
+            </div>
+            <div class="grid">
+                <div class="card rv">
+                    <span class="tag">01</span>
+                    <h3 data-i18n="ag.1.t">自然语言交互</h3>
+                    <p data-i18n="ag.1.d">用中文或英文描述实验需求，智能体自动理解并生成对应的 .pp 脉冲程序。</p>
+                </div>
+                <div class="card rv">
+                    <span class="tag">02</span>
+                    <h3 data-i18n="ag.2.t">混合检索</h3>
+                    <p data-i18n="ag.2.d">pgvector 向量检索、关键词检索与 SQL 智能体融合重排，并带元数据白名单过滤。</p>
+                </div>
+                <div class="card rv">
+                    <span class="tag">03</span>
+                    <h3 data-i18n="ag.3.t">两层校验</h3>
+                    <p data-i18n="ag.3.d">先做语法与符号检查，再做 TopSpin NMRSIM 物理仿真。未通过时反馈给 LLM 自动重试。</p>
+                </div>
+                <div class="card rv">
+                    <span class="tag">04</span>
+                    <h3 data-i18n="ag.4.t">专业知识库</h3>
+                    <p data-i18n="ag.4.d">人工整理的 Wiki 覆盖各实验族、TROSY、弛豫与固体 NMR，为生成提供可靠上下文。</p>
+                </div>
+                <div class="card rv">
+                    <span class="tag">05</span>
+                    <h3 data-i18n="ag.5.t">文件与图片输入</h3>
+                    <p data-i18n="ag.5.d">上传 TXT 参数文件，或上传脉冲序列示意图，自动解析时序与参数并生成代码。</p>
+                </div>
+                <div class="card rv">
+                    <span class="tag">06</span>
+                    <h3 data-i18n="ag.6.t">多种接入方式</h3>
+                    <p data-i18n="ag.6.d">OpenWebUI 对话界面、兼容 OpenAI 的 REST API，以及 MCP 服务，方便接入你的工作流。</p>
+                </div>
+            </div>
+            <div class="head rv" style="margin: 64px 0 32px">
+                <h2 style="font-size: 1.8rem" data-i18n="mode.title">三种输入方式</h2>
+            </div>
+            <div class="grid">
+                <a class="card rv" href="https://nmragent.201014.xyz?mode=text">
+                    <h3 data-i18n="mode.1.t">自然语言输入</h3>
+                    <p data-i18n="mode.1.d">例如：“生成一个自旋回波序列，TE=100ms”</p>
+                </a>
+                <a class="card rv" href="https://nmragent.201014.xyz?mode=upload">
+                    <h3 data-i18n="mode.2.t">上传 TXT 文件</h3>
+                    <p data-i18n="mode.2.d">上传实验参数文件，自动解析并生成脉冲序列</p>
+                </a>
+                <a class="card rv" href="https://nmragent.201014.xyz?mode=image">
+                    <h3 data-i18n="mode.3.t">上传脉冲图片</h3>
+                    <p data-i18n="mode.3.d">上传示意图，识别时序与参数后生成代码</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="nmrsim" class="alt">
+        <div class="container split">
+            <div class="rv">
+                <span class="tag">NMRSIMPY · v0.1.0</span>
+                <h2 data-i18n="sim.title"><em>nmrsimpy</em>：Python 里的脉冲程序仿真</h2>
+                <p data-i18n="sim.desc">读取 Bruker 脉冲程序（.pp）和自旋体系（.ham），演化密度矩阵并合成 FID，无需打开 TopSpin。多数实验族的 FID 与 NMRSIM 输出的余弦相似度不低于 0.99。</p>
+                <ul class="ticks">
+                    <li data-i18n="sim.1">直接运行真实 .pp 文件：语料库 808 个文件中 761 个可解析</li>
+                    <li data-i18n="sim.2">密度矩阵仿真，覆盖脉冲、延时、J 耦合、频偏与强耦合项（最多 11 个自旋）</li>
+                    <li data-i18n="sim.3">支持成形脉冲、梯度（echo/antiecho）、去耦与 T1/T2 弛豫</li>
+                    <li data-i18n="sim.4">1D、2D（QF、echo-antiecho、TPPI）与 N 维执行器</li>
+                    <li data-i18n="sim.5">编译期错误检查，与 NMRSIM 内核的报错信息对齐</li>
+                    <li data-i18n="sim.6">依赖精简：numpy 与 bruker-lark，Python 3.10+</li>
+                </ul>
+                <p class="note" data-i18n="sim.note">已知限制：不支持超过 11 个自旋，不支持 CW 与 chirp 脉冲，脉冲期间的弛豫未建模。</p>
+            </div>
+            <div class="term rv" aria-label="nmrsimpy CLI">
+                <div class="term-bar"><i></i><i></i><i></i></div>
+<pre><span class="c"># run one dataset</span>
+<span class="p">$</span> nmrsimpy run exp41/
+
+<span class="c"># 2D run, save FID and plot the spectrum</span>
+<span class="p">$</span> nmrsimpy run exp57/ --td1 256 \
+    -o s.npz --plot spec.png
+
+<span class="c"># custom pulse program + spin system</span>
+<span class="p">$</span> nmrsimpy run sim.cfg \
+    --pp my.pp --ham ethanol.ham
+
+<span class="c"># batch over many datasets</span>
+<span class="p">$</span> nmrsimpy batch /path/to/datasets \
+    --out-dir results/ --limit 50</pre>
+            </div>
+        </div>
+    </section>
+
+    <section id="graphpulse">
+        <div class="container">
+            <div class="head rv" style="margin-bottom: 40px">
+                <h2><em>GraphPulse</em> <span data-i18n="gp.head">演示</span></h2>
+                <p data-i18n="gp.sub">57 秒看完：从几十行 .pp 源码到可交互的时序图</p>
+            </div>
+            <figure class="film rv">
+                <video id="promo" controls preload="none" playsinline poster="media/graphpulse-poster.jpg" width="1280" height="720">
+                    <source src="media/graphpulse-promo.mp4" type="video/mp4">
+                    <p data-i18n="gp.nofilm">你的浏览器不支持视频播放。<a href="media/graphpulse-promo.mp4">直接下载视频</a>。</p>
+                </video>
+                <figcaption data-i18n="gp.cap">GraphPulse 宣传片 · 泳道视图、源码联动、实时重解析与仿真工作台</figcaption>
+            </figure>
+        </div>
+        <div class="container split" style="margin-top: 72px">
+            <div class="viz rv" aria-hidden="true">
+                <svg viewBox="0 0 480 200">
+                    <text x="0" y="36">f1</text><text x="0" y="81">f2</text><text x="0" y="126">grad</text><text x="0" y="171">acq</text>
+                    <line class="base" x1="40" y1="40" x2="470" y2="40"/><line class="base" x1="40" y1="85" x2="470" y2="85"/>
+                    <line class="base" x1="40" y1="130" x2="470" y2="130"/><line class="base" x1="40" y1="175" x2="470" y2="175"/>
+                    <rect class="pl" x="70" y="20" width="12" height="20"/>
+                    <rect class="pl" x="150" y="8" width="24" height="32"/>
+                    <rect class="hl" x="146" y="4" width="32" height="40" rx="4"/>
+                    <rect class="pl" x="70" y="65" width="12" height="20"/>
+                    <rect class="pl" x="230" y="65" width="12" height="20"/>
+                    <rect class="gr" x="100" y="108" width="30" height="22"/>
+                    <rect class="gr" x="190" y="108" width="30" height="22"/>
+                    <path class="acq" d="M280 175 q6 -22 12 0 t12 0 t12 0 t12 0 t12 0 t12 0 t12 0 t12 0 t12 0 t12 0 t12 0 t12 0 t12 0 t12 0"/>
+                </svg>
+            </div>
+            <div class="rv">
+                <span class="tag">GRAPHPULSE · v0.1.0</span>
+                <h2 data-i18n="gp.title"><em>GraphPulse</em>：看得见的脉冲程序</h2>
+                <p data-i18n="gp.desc">把 Bruker .pp 文件渲染成 TopSpin 风格的泳道时序图，并与源码保持同步。可在浏览器里查看、编辑与导出。</p>
+                <ul class="ticks">
+                    <li data-i18n="gp.1">泳道视图：f1、f2、grad、delay、acq、meta，对齐的脉冲同时显示</li>
+                    <li data-i18n="gp.2">双向联动：点击事件高亮源码行，点击源码行高亮事件</li>
+                    <li data-i18n="gp.3">CodeMirror 在线编辑，修改后实时重新解析，无需刷新页面</li>
+                    <li data-i18n="gp.4">可选 AI 灰字补全：配置兼容 OpenAI 的上游后按 Tab 采纳</li>
+                    <li data-i18n="gp.5">仿真工作区（开发模式）：SLEEPY、Prodopy，以及 Spinach 与 TopSpin 并排对比</li>
+                    <li data-i18n="gp.6">中英双语界面与明暗主题；示例库含 26 个脉冲程序</li>
+                </ul>
+                <div class="cta-row" style="justify-content: flex-start; margin-top: 26px">
+                    <a class="btn btn-p" href="https://graphpulse.201014.xyz" target="_blank" rel="noopener" data-i18n="gp.try">在线体验 GraphPulse</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="models" class="alt">
+        <div class="container">
+            <div class="head rv">
+                <h2 data-i18n="mod.title">模型与 <em>数据集</em></h2>
+                <p data-i18n="mod.sub">在 ModelScope 与 Hugging Face 上浏览我发布的模型和数据集</p>
+            </div>
+            <div class="grid">
+                <a class="card rv" href="https://modelscope.cn/profile/tonykw12" target="_blank" rel="noopener">
+                    <div class="host">
+                        <svg viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="11" fill="#16233a"/><path d="M12 31V13l10 11 10-11v18" fill="none" stroke="#7fa8d9" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+                        <div><b>ModelScope</b><span>modelscope.cn/profile/tonykw12</span></div>
+                    </div>
+                    <span class="more" data-i18n="mod.visit">访问主页 →</span>
+                </a>
+                <a class="card rv" href="https://huggingface.co/tonykw12" target="_blank" rel="noopener">
+                    <div class="host">
+                        <svg viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="11" fill="#16233a"/><circle cx="22" cy="23" r="11" fill="none" stroke="#d4b06a" stroke-width="3"/><circle cx="18" cy="21" r="1.8" fill="#d4b06a"/><circle cx="26" cy="21" r="1.8" fill="#d4b06a"/><path d="M17.5 26.5q4.5 4 9 0" fill="none" stroke="#d4b06a" stroke-width="2.2" stroke-linecap="round"/></svg>
+                        <div><b>Hugging Face</b><span>huggingface.co/tonykw12</span></div>
+                    </div>
+                    <span class="more" data-i18n="mod.visit">访问主页 →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="cta-box rv">
+                <h2 data-i18n="cta.title">让 NMR 脉冲序列研究更高效</h2>
+                <p data-i18n="cta.desc">从实验描述到可执行脉冲程序、物理仿真验证与可视化的完整工作流</p>
+                <a class="btn btn-lg" href="https://nmragent.201014.xyz" data-i18n="hero.start">开始使用</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="cols">
+                <div>
+                    <h4>NMR Agent</h4>
+                    <p data-i18n="ft.about">NMRagent（AI 脉冲序列生成）、nmrsimpy（脉冲程序仿真）与 GraphPulse（TopSpin 风格可视化），源自清华大学薛毅实验室的 NMR 科研实践。</p>
+                </div>
+                <div>
+                    <h4 data-i18n="ft.products">产品</h4>
+                    <ul>
+                        <li><a href="https://nmragent.201014.xyz">NMRagent</a></li>
+                        <li><a href="#nmrsim">nmrsimpy</a></li>
+                        <li><a href="https://graphpulse.201014.xyz" target="_blank" rel="noopener">GraphPulse</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 data-i18n="ft.community">社区</h4>
+                    <ul>
+                        <li><a href="https://github.com/Tonystarkw12" target="_blank" rel="noopener">GitHub</a></li>
+                        <li><a href="https://modelscope.cn/profile/tonykw12" target="_blank" rel="noopener">ModelScope</a></li>
+                        <li><a href="https://huggingface.co/tonykw12" target="_blank" rel="noopener">Hugging Face</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 data-i18n="ft.contact">联系</h4>
+                    <ul>
+                        <li><a href="mailto:zhou-zh23@mails.tsinghua.edu.cn" data-i18n="ft.email">发送邮件</a></li>
+                        <li><a href="https://zihang.201014.xyz" target="_blank" rel="noopener" data-i18n="ft.home">个人主页</a></li>
+                        <li><a href="https://rainbow.life.tsinghua.edu.cn/" target="_blank" rel="noopener" data-i18n="ft.lab">清华大学薛毅实验室</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copy">&copy; 2026 Zihang Zhou · NMR Agent. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        // 英文文案；中文取自 HTML 原文（首次切换时缓存）
+        const EN = {
+            'page.title': 'NMR Agent - AI-Powered NMR Pulse Sequence Toolchain',
+            'page.desc': 'Generate Bruker TopSpin pulse programs from natural language, with physics-simulation validation and visualization',
+            'nav.products': 'Products', 'nav.models': 'Models & Data', 'nav.try': 'Try Now',
+            'hero.badge': 'AI-Powered NMR Pulse Sequence Toolchain',
+            'hero.title': 'Generate <em>verified</em> NMR pulse<br>sequences from natural language',
+            'hero.desc': 'NMRagent turns experiment descriptions into Bruker TopSpin pulse programs. nmrsimpy checks them with physics simulation. GraphPulse draws them as TopSpin-style timing diagrams. From one sentence to a visualized, verified .pp file.',
+            'hero.start': 'Start Using', 'hero.more': 'Learn More',
+            'stat.1': '<b>2 layers</b>Syntax + physics-simulation checks',
+            'stat.2': '<b>4</b>Simulation backends to compare',
+            'stat.3': '<b>26</b>Bundled example pulse programs',
+            'stat.4': '<b>12</b>Experiment families covered',
+            'prod.title': 'Three tools, <em>one workflow</em>',
+            'prod.sub': 'From a one-line request to a simulation-verified, inspectable pulse program',
+            'prod.1.tag': '01 · Generate', 'prod.2.tag': '02 · Simulate', 'prod.3.tag': '03 · Visualize',
+            'prod.1.desc': 'A retrieval-augmented LLM agent that turns natural-language requests into Bruker TopSpin pulse programs, with automatic validation and retry.',
+            'prod.2.desc': 'A headless pulse-program simulation engine in pure Python: reads .pp files and spin systems, evolves the density matrix, outputs the FID.',
+            'prod.3.desc': 'A TopSpin-style pulse-program viewer and editor: lane timing diagrams linked both ways to the source, editable online.',
+            'prod.more': 'Learn more →',
+            'ag.title': 'Core Features',
+            'ag.sub': 'Retrieve, generate, validate, retry: output you can import straight into TopSpin',
+            'ag.1.t': 'Natural Language Interaction', 'ag.1.d': 'Describe your experiment in Chinese or English. The agent understands it and generates the matching .pp pulse program.',
+            'ag.2.t': 'Hybrid Retrieval', 'ag.2.d': 'pgvector similarity, keyword search and a SQL agent are fused and re-ranked, with metadata whitelist filtering.',
+            'ag.3.t': 'Two-Layer Validation', 'ag.3.d': 'Syntax and symbol checks first, then TopSpin NMRSIM physics simulation. Failures go back to the LLM for automatic retry.',
+            'ag.4.t': 'Curated Knowledge Base', 'ag.4.d': 'A hand-written wiki covers experiment families, TROSY, relaxation and solid-state NMR to ground generation.',
+            'ag.5.t': 'File & Image Input', 'ag.5.d': 'Upload a TXT parameter file or a pulse-sequence diagram. Timing and parameters are parsed into code.',
+            'ag.6.t': 'Multiple Interfaces', 'ag.6.d': 'An OpenWebUI chat, an OpenAI-compatible REST API and an MCP server, so it fits your workflow.',
+            'mode.title': 'Three Ways to Start',
+            'mode.1.t': 'Natural Language Input', 'mode.1.d': 'For example: "Generate a spin echo sequence, TE=100ms"',
+            'mode.2.t': 'Upload TXT File', 'mode.2.d': 'Upload a parameter file to parse and generate a pulse sequence',
+            'mode.3.t': 'Upload Pulse Image', 'mode.3.d': 'Upload a diagram; timing and parameters are recognized and turned into code',
+            'sim.title': '<em>nmrsimpy</em>: pulse-program simulation in Python',
+            'sim.desc': 'Reads a Bruker pulse program (.pp) and a spin system (.ham), evolves the density matrix and synthesizes the FID, with no TopSpin session needed. For most experiment families the FID matches NMRSIM output with cosine similarity of at least 0.99.',
+            'sim.1': 'Runs real .pp files: 761 of 808 corpus files parse',
+            'sim.2': 'Density-matrix simulation of pulses, delays, J coupling, offsets and strong-coupling terms (up to 11 spins)',
+            'sim.3': 'Shaped pulses, gradients (echo/antiecho), decoupling and T1/T2 relaxation',
+            'sim.4': '1D, 2D (QF, echo-antiecho, TPPI) and N-D executors',
+            'sim.5': 'Compile-time error checks aligned with NMRSIM kernel messages',
+            'sim.6': 'Light dependencies: numpy and bruker-lark, Python 3.10+',
+            'sim.note': 'Known limits: no more than 11 spins, no CW or chirp pulses, relaxation during pulses is not modeled.',
+            'gp.title': '<em>GraphPulse</em>: pulse programs you can see',
+            'gp.desc': 'Renders Bruker .pp files as TopSpin-style lane timing diagrams and keeps them in sync with the source. View, edit and export in the browser.',
+            'gp.1': 'Lane view: f1, f2, grad, delay, acq, meta, with aligned pulses shown together',
+            'gp.2': 'Two-way linking: click an event to highlight its source line, and the reverse',
+            'gp.3': 'In-browser CodeMirror editing with live re-parsing, no page reload',
+            'gp.4': 'Optional AI ghost-text completion: set an OpenAI-compatible upstream and press Tab to accept',
+            'gp.5': 'Simulation workspace (dev mode): SLEEPY, Prodopy, plus Spinach and TopSpin side by side',
+            'gp.6': 'Bilingual UI with light and dark themes; 26 bundled example programs',
+            'gp.try': 'Try GraphPulse online',
+            'gp.head': 'Demo',
+            'gp.sub': '57 seconds: from a few dozen lines of .pp source to an interactive timing diagram',
+            'gp.cap': 'GraphPulse trailer: lane view, source linking, live re-parsing and the simulation workspace',
+            'gp.nofilm': 'Your browser cannot play this video. <a href="media/graphpulse-promo.mp4">Download it instead</a>.',
+            'mod.title': 'Models & <em>Datasets</em>',
+            'mod.sub': 'Browse my models and datasets on ModelScope and Hugging Face',
+            'mod.visit': 'Visit profile →',
+            'cta.title': 'Make NMR pulse sequence research more efficient',
+            'cta.desc': 'A complete workflow from experiment description to executable pulse programs, physics-simulation checks and visualization',
+            'ft.about': 'NMRagent (AI pulse-sequence generation), nmrsimpy (pulse-program simulation) and GraphPulse (TopSpin-style visualization), from NMR research in the Xue Yi Lab at Tsinghua University.',
+            'ft.products': 'Products', 'ft.community': 'Community', 'ft.contact': 'Contact',
+            'ft.email': 'Email Us', 'ft.home': 'Homepage', 'ft.lab': 'Xue Yi Lab, Tsinghua University'
+        };
+        const KEY = 'nmr-agent-lang';
+        const nodes = [...document.querySelectorAll('[data-i18n]')];
+        const meta = document.querySelector('meta[name="description"]');
+        const ZH = {};
+        nodes.forEach(el => { ZH[el.dataset.i18n] = el.tagName === 'META' ? el.content : el.innerHTML; });
+
+        function setLang(lang) {
+            const t = lang === 'en' ? EN : ZH;
+            document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+            nodes.forEach(el => {
+                const v = t[el.dataset.i18n];
+                if (v === undefined) return;
+                if (el.tagName === 'TITLE') document.title = v;
+                else if (el.tagName === 'META') el.content = v;
+                else el.innerHTML = v;
+            });
+            document.getElementById('lang').textContent = lang === 'en' ? '中文' : 'EN';
+            localStorage.setItem(KEY, lang);
+        }
+        document.getElementById('lang').addEventListener('click', () =>
+            setLang(document.documentElement.lang === 'en' ? 'zh' : 'en'));
+        document.getElementById('theme').addEventListener('click', () => {
+            const t = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.dataset.theme = t;
+            localStorage.setItem('nmr-agent-theme', t);
+        });
+        const saved = localStorage.getItem(KEY);
+        const initial = saved === 'en' || saved === 'zh' ? saved : (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+        if (initial === 'en') setLang('en');
+
+        // Hero 谱图：洛伦兹峰叠加 + 衰减 FID
+        const peaks = [[150, 70, 5], [168, 110, 5], [186, 70, 5], [330, 150, 6], [470, 60, 5], [488, 60, 5],
+                       [620, 100, 6], [638, 100, 6], [760, 130, 6]];
+        let d = '';
+        for (let x = 0; x <= 900; x += 2) {
+            const y = 215 - peaks.reduce((s, [c, h, w]) => s + h * w * w / ((x - c) ** 2 + w * w), 0);
+            d += (x ? 'L' : 'M') + x + ' ' + y.toFixed(1);
+        }
+        document.getElementById('sp').setAttribute('d', d);
+        let f = '';
+        for (let x = 0; x <= 900; x += 2) {
+            const y = 50 + 38 * Math.exp(-x / 320) * Math.cos(x / 5);
+            f += (x ? 'L' : 'M') + x + ' ' + y.toFixed(1);
+        }
+        document.getElementById('fid').setAttribute('d', f);
+
+        // 滚动显现；动画结束后移除 .rv，避免覆盖卡片 hover 的 transform
+        const io = new IntersectionObserver(entries => entries.forEach(e => {
+            if (!e.isIntersecting) return;
+            const el = e.target;
+            io.unobserve(el);
+            const i = [...el.parentElement.children].indexOf(el);
+            setTimeout(() => {
+                el.classList.add('in');
+                setTimeout(() => el.classList.remove('rv', 'in'), 700);
+            }, Math.min(i, 5) * 80);
+        }), { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.rv').forEach(el => io.observe(el));
+    </script>
+</body>
+</html>
+
