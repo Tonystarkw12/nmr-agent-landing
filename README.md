@@ -5,6 +5,7 @@ NMR Agent 课题产品宣传页的源仓库。
 - 线上：https://nmr.201014.xyz
 - Pages 项目：`nmr-agent-landing`（Cloudflare Pages，**Git 集成** — push 即自动重建部署）
 - 分支：`main`（生产分支）
+- GraphPulse 桌面客户端（Windows/macOS/Linux）：发布在 [GitHub Releases](https://github.com/Tonystarkw12/nmr-agent-landing/releases)，页面下载卡直链 `releases/latest/download/<文件名>`。注意 Linux AppImage 76MB 超出 Cloudflare Pages 单文件 25MiB 上限，安装包一律走 Releases，不进仓库。
 
 ## 内容
 
