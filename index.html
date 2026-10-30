@@ -251,7 +251,7 @@
                 <li><a href="#nmrsim">nmrsimpy</a></li>
                 <li><a href="#graphpulse">GraphPulse</a></li>
                 <li><a href="#brukerpp">Bruker PP</a></li>
-                <li><a href="#models" data-i18n="nav.models">模型与数据</a></li>
+                <li><a href="#models" data-i18n="nav.models">模型与生态</a></li>
             </ul>
             <div class="right">
                 <button class="lang" id="theme" type="button" aria-label="Toggle light/dark theme">◐</button>
@@ -568,8 +568,8 @@
     <section id="models" class="alt">
         <div class="container">
             <div class="head rv">
-                <h2 data-i18n="mod.title">模型与 <em>数据集</em></h2>
-                <p data-i18n="mod.sub">在 ModelScope 与 Hugging Face 上浏览我发布的模型和数据集</p>
+                <h2 data-i18n="mod.title">模型、AI Skills 与 <em>开源生态</em></h2>
+                <p data-i18n="mod.sub">在 ModelScope、CNB 与 Hugging Face 上浏览我发布的大模型、AI Skills、Python 软件包与数据集</p>
             </div>
             <div class="grid">
                 <a class="card rv" href="https://modelscope.cn/profile/tonykw12" target="_blank" rel="noopener">
@@ -577,6 +577,15 @@
                         <svg viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="11" fill="#16233a"/><path d="M12 31V13l10 11 10-11v18" fill="none" stroke="#7fa8d9" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
                         <div><b>ModelScope</b><span>modelscope.cn/profile/tonykw12</span></div>
                     </div>
+                    <p style="margin-top: 14px; font-size: 0.92rem; color: var(--mute);" data-i18n="mod.ms.desc">发布的 NMR 脉冲领域模型、微调权重以及大量专有的 AI Skills 工具库。</p>
+                    <span class="more" data-i18n="mod.visit">访问主页 →</span>
+                </a>
+                <a class="card rv" href="https://cnb.cool/u/tony" target="_blank" rel="noopener">
+                    <div class="host">
+                        <svg viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="11" fill="#16233a"/><polyline points="14 16 20 22 14 28" fill="none" stroke="#7fa8d9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="22" y1="28" x2="30" y2="28" stroke="#d4b06a" stroke-width="2.6" stroke-linecap="round"/></svg>
+                        <div><b>CNB 开源平台</b><span>cnb.cool/u/tony</span></div>
+                    </div>
+                    <p style="margin-top: 14px; font-size: 0.92rem; color: var(--mute);" data-i18n="mod.cnb.desc">发布的各种 NMR 相关 Python 软件包、物理仿真内核及云原生开源项目。</p>
                     <span class="more" data-i18n="mod.visit">访问主页 →</span>
                 </a>
                 <a class="card rv" href="https://huggingface.co/tonykw12" target="_blank" rel="noopener">
@@ -584,6 +593,7 @@
                         <svg viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="11" fill="#16233a"/><circle cx="22" cy="23" r="11" fill="none" stroke="#d4b06a" stroke-width="3"/><circle cx="18" cy="21" r="1.8" fill="#d4b06a"/><circle cx="26" cy="21" r="1.8" fill="#d4b06a"/><path d="M17.5 26.5q4.5 4 9 0" fill="none" stroke="#d4b06a" stroke-width="2.2" stroke-linecap="round"/></svg>
                         <div><b>Hugging Face</b><span>huggingface.co/tonykw12</span></div>
                     </div>
+                    <p style="margin-top: 14px; font-size: 0.92rem; color: var(--mute);" data-i18n="mod.hf.desc">自旋动力学训练语料、脉冲程序评测基准数据集与开源权重。</p>
                     <span class="more" data-i18n="mod.visit">访问主页 →</span>
                 </a>
             </div>
@@ -617,11 +627,12 @@
                     </ul>
                 </div>
                 <div>
-                    <h4 data-i18n="ft.community">社区</h4>
+                    <h4 data-i18n="ft.community">开源与社区</h4>
                     <ul>
                         <li><a href="https://github.com/Tonystarkw12" target="_blank" rel="noopener">GitHub</a></li>
-                        <li><a href="https://modelscope.cn/profile/tonykw12" target="_blank" rel="noopener">ModelScope</a></li>
-                        <li><a href="https://huggingface.co/tonykw12" target="_blank" rel="noopener">Hugging Face</a></li>
+                        <li><a href="https://cnb.cool/u/tony" target="_blank" rel="noopener">CNB (Python 软件包)</a></li>
+                        <li><a href="https://modelscope.cn/profile/tonykw12" target="_blank" rel="noopener">ModelScope (模型 & AI Skills)</a></li>
+                        <li><a href="https://huggingface.co/tonykw12" target="_blank" rel="noopener">Hugging Face (数据集)</a></li>
                     </ul>
                 </div>
                 <div>
@@ -642,7 +653,7 @@
         const EN = {
             'page.title': 'NMR Agent - AI-Powered NMR Pulse Sequence Toolchain',
             'page.desc': 'Generate Bruker TopSpin pulse programs from natural language, with physics-simulation validation and visualization',
-            'nav.products': 'Products', 'nav.models': 'Models & Data', 'nav.try': 'Try Now',
+            'nav.products': 'Products', 'nav.models': 'Models & Ecosystem', 'nav.try': 'Try Now',
             'hero.badge': 'AI-Powered NMR Pulse Sequence Toolchain',
             'hero.title': 'Generate <em>verified</em> NMR pulse<br>sequences from natural language',
             'hero.desc': 'NMRagent turns experiment descriptions into Bruker TopSpin pulse programs. nmrsimpy checks them with physics simulation. GraphPulse draws them as TopSpin-style timing diagrams. From one sentence to a visualized, verified .pp file.',
@@ -719,13 +730,16 @@
             'bp.github': 'View on GitHub',
             'bp.nofilm': 'Your browser cannot play this video. <a href="media/bruker-pp-promo.mp4">Download it instead</a>.',
             'bp.cap': 'Bruker Pulse Program trailer: syntax highlighting, LSP IntelliSense, live validation and AST visualization',
-            'mod.title': 'Models & <em>Datasets</em>',
-            'mod.sub': 'Browse my models and datasets on ModelScope and Hugging Face',
+            'mod.title': 'Models, AI Skills & <em>Ecosystem</em>',
+            'mod.sub': 'Browse my models, AI Skills, Python packages, and datasets on ModelScope, CNB, and Hugging Face',
+            'mod.ms.desc': 'Domain-specific NMR pulse models, fine-tuned weights, and custom AI Agent Skills.',
+            'mod.cnb.desc': 'NMR-related Python packages, physical simulation kernels, and cloud-native repositories.',
+            'mod.hf.desc': 'Spin dynamics training corpora, pulse program benchmark datasets, and open weights.',
             'mod.visit': 'Visit profile →',
             'cta.title': 'Make NMR pulse sequence research more efficient',
             'cta.desc': 'A complete workflow from experiment description to executable pulse programs, physics-simulation checks and visualization',
             'ft.about': 'NMRagent (AI pulse-sequence generation), nmrsimpy (pulse-program simulation), GraphPulse (TopSpin-style visualization) and Bruker PP (VSCode editor), from NMR research in the Xue Yi Lab at Tsinghua University.',
-            'ft.products': 'Products', 'ft.community': 'Community', 'ft.contact': 'Contact',
+            'ft.products': 'Products', 'ft.community': 'Open Source & Community', 'ft.contact': 'Contact',
             'ft.email': 'Email Us', 'ft.home': 'Homepage', 'ft.lab': 'Xue Yi Lab, Tsinghua University'
         };
         const KEY = 'nmr-agent-lang';
