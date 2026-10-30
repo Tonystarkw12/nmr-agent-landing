@@ -5,6 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="page.title">NMR Agent - AI 驱动的 NMR 脉冲序列工具链</title>
     <meta name="description" data-i18n="page.desc" content="用自然语言生成 Bruker TopSpin 脉冲程序，配套物理仿真校验与可视化，让 NMR 科研更高效">
+    <meta name="keywords" content="NMR Agent, Bruker TopSpin, 脉冲序列, 核磁共振, NMR simulation, nmrsim-py, GraphPulse, 自旋动力学, 脉冲时序可视化, AI for Science">
+    <meta name="author" content="tony">
+    <link rel="canonical" href="https://nmr.201014.xyz/">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nmr.201014.xyz/">
+    <meta property="og:site_name" content="NMR Agent">
+    <meta property="og:title" content="NMR Agent - AI 驱动的 NMR 脉冲序列工具链">
+    <meta property="og:description" content="用自然语言生成 Bruker TopSpin 脉冲程序，配套物理仿真校验与可视化，让 NMR 科研更高效">
+    <meta property="og:image" content="https://nmr.201014.xyz/media/graphpulse-poster.jpg">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NMR Agent - AI 驱动的 NMR 脉冲序列工具链">
+    <meta name="twitter:description" content="用自然语言生成 Bruker TopSpin 脉冲程序，配套物理仿真校验与可视化，让 NMR 科研更高效">
+    <meta name="twitter:image" content="https://nmr.201014.xyz/media/graphpulse-poster.jpg">
+
+    <!-- Schema.org JSON-LD (SoftwareApplication & ResearchProject for GEO/SEO) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://nmr.201014.xyz/#website",
+          "url": "https://nmr.201014.xyz/",
+          "name": "NMR Agent",
+          "description": "AI 驱动的 NMR 脉冲序列工具链与科研工作流平台",
+          "inLanguage": ["zh-CN", "en"]
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://nmr.201014.xyz/#software",
+          "name": "NMR Agent Suite",
+          "applicationCategory": "ScienceApplication",
+          "operatingSystem": "Web, Windows, macOS, Linux",
+          "description": "基于大语言模型、自旋物理仿真核(nmrsim-py)与桌面端交互时序图可视化(GraphPulse)的核磁共振脉冲开发全生命周期工具链。",
+          "url": "https://nmr.201014.xyz/",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "softwareRequirements": "Bruker TopSpin 兼容",
+          "featureList": [
+            "自然语言交互生成符合 Bruker TopSpin 语法的标准脉冲程序",
+            "基于第一性原理自旋动力学引擎 nmrsim-py 的物理正确性校验",
+            "跨平台桌面端 GraphPulse 脉冲时序与相循环交互式可视化"
+          ]
+        }
+      ]
+    }
+    </script>
     <script>
         (function () {
             const d = document.documentElement;
@@ -194,6 +250,7 @@
                 <li><a href="#nmragent">NMRagent</a></li>
                 <li><a href="#nmrsim">nmrsimpy</a></li>
                 <li><a href="#graphpulse">GraphPulse</a></li>
+                <li><a href="#brukerpp">Bruker PP</a></li>
                 <li><a href="#models" data-i18n="nav.models">模型与数据</a></li>
             </ul>
             <div class="right">
@@ -252,6 +309,12 @@
                     <span class="tag" data-i18n="prod.3.tag">03 · 可视化</span>
                     <h3>GraphPulse</h3>
                     <p data-i18n="prod.3.desc">TopSpin 风格的脉冲程序查看与编辑器：泳道时序图与源码双向联动，可在线编辑。</p>
+                    <span class="more" data-i18n="prod.more">了解详情 →</span>
+                </a>
+                <a class="card rv" href="#brukerpp">
+                    <span class="tag" data-i18n="prod.4.tag">04 · 编辑器</span>
+                    <h3>Bruker PP</h3>
+                    <p data-i18n="prod.4.desc">VSCode 插件：语法高亮、LSP 智能补全、实时验证与 AST 查看，为 Bruker .pp 量身打造。</p>
                     <span class="more" data-i18n="prod.more">了解详情 →</span>
                 </a>
             </div>
@@ -447,6 +510,61 @@
         </div>
     </section>
 
+    <section id="brukerpp">
+        <div class="container">
+            <div class="head rv" style="margin-bottom: 40px">
+                <h2><em>Bruker Pulse Program</em> <span data-i18n="bp.head">VSCode 插件</span></h2>
+                <p data-i18n="bp.sub">为 Bruker .pp 脉冲程序量身打造的现代编辑器体验</p>
+            </div>
+            <figure class="film rv">
+                <video controls preload="none" playsinline poster="media/bruker-pp-poster.jpg" width="1280" height="720">
+                    <source src="media/bruker-pp-promo.mp4" type="video/mp4">
+                    <p data-i18n="bp.nofilm">你的浏览器不支持视频播放。<a href="media/bruker-pp-promo.mp4">直接下载视频</a>。</p>
+                </video>
+                <figcaption data-i18n="bp.cap">Bruker Pulse Program 宣传片 · 语法高亮、LSP 智能补全、实时验证与 AST 可视化</figcaption>
+            </figure>
+        </div>
+        <div class="container split" style="margin-top: 72px">
+            <div class="rv">
+                <span class="tag">BRUKER PULSE PROGRAM · v3.0.0</span>
+                <h2 data-i18n="bp.title"><em>Bruker PP</em>：.pp 文件的 IDE 级体验</h2>
+                <p data-i18n="bp.desc">在 VSCode 中获得完整的 Bruker 脉冲程序开发支持：TextMate 语法高亮、LSP 智能补全、Lark 解析器校验、AST 查看与 30+ 代码片段。</p>
+                <ul class="ticks">
+                    <li data-i18n="bp.1">语法高亮：基于完整 EBNF 语法，覆盖脉冲、延时、相位、梯度、去耦等全部元素</li>
+                    <li data-i18n="bp.2">LSP 智能：悬停文档、自动补全、跳转定义、查找引用、重命名与语义高亮</li>
+                    <li data-i18n="bp.3">实时验证：Lark Earley 解析器逐字符校验，错误精确到行列，中文提示</li>
+                    <li data-i18n="bp.4">AST 查看：一键将脉冲程序解析为抽象语法树，格式化 JSON 输出</li>
+                    <li data-i18n="bp.5">30+ 代码片段：calc、ph、pg、go、mc、lo、gron/groff 等常用模式一键插入</li>
+                    <li data-i18n="bp.6">自动补全：p0-p63、d0-d63、ph0-ph31、通道修饰符与用户自定义符号</li>
+                </ul>
+                <div class="cta-row" style="justify-content: flex-start; margin-top: 26px">
+                    <a class="btn btn-p" href="https://github.com/Tonystarkw12/pp2ast/tree/main/bruker_lark/vscode-extension" target="_blank" rel="noopener" data-i18n="bp.github">GitHub 查看源码</a>
+                </div>
+            </div>
+            <div class="term rv" aria-label="Bruker PP code example">
+                <div class="term-bar"><i></i><i></i><i></i></div>
+<pre><span class="c">;  NOESY 脉冲序列示例</span>
+<span class="p">prog</span> noesygpphpp
+
+<span class="p">include</span> &lt;Avance.incl&gt;
+<span class="p">include</span> &lt;Grad.incl&gt;
+
+<span class="p">define delay</span> d1
+<span class="p">define delay</span> d20
+<span class="p">define pulse</span> p1
+
+<span class="c">"p1" = p1 ;90° 脉冲</span>
+<span class="c">"d1" = d1 ;弛豫延时</span>
+
+<span class="p">1</span> ze
+<span class="p">2</span> d1
+  p1 ph1
+  d20
+  p1 ph2</pre>
+            </div>
+        </div>
+    </section>
+
     <section id="models" class="alt">
         <div class="container">
             <div class="head rv">
@@ -487,7 +605,7 @@
             <div class="cols">
                 <div>
                     <h4>NMR Agent</h4>
-                    <p data-i18n="ft.about">NMRagent（AI 脉冲序列生成）、nmrsimpy（脉冲程序仿真）与 GraphPulse（TopSpin 风格可视化），源自清华大学薛毅实验室的 NMR 科研实践。</p>
+                    <p data-i18n="ft.about">NMRagent（AI 脉冲序列生成）、nmrsimpy（脉冲程序仿真）、GraphPulse（TopSpin 风格可视化）与 Bruker PP（VSCode 编辑器），源自清华大学薛毅实验室的 NMR 科研实践。</p>
                 </div>
                 <div>
                     <h4 data-i18n="ft.products">产品</h4>
@@ -495,6 +613,7 @@
                         <li><a href="https://nmragent.201014.xyz">NMRagent</a></li>
                         <li><a href="#nmrsim">nmrsimpy</a></li>
                         <li><a href="https://graphpulse.201014.xyz" target="_blank" rel="noopener">GraphPulse</a></li>
+                        <li><a href="#brukerpp">Bruker PP</a></li>
                     </ul>
                 </div>
                 <div>
@@ -585,12 +704,27 @@
             'gp.dl.2.t': 'macOS Image', 'gp.dl.2.d': 'DMG image, 8.2 MB. Unsigned: right-click → Open on first launch.',
             'gp.dl.3.t': 'Linux AppImage', 'gp.dl.3.d': 'AppImage, 76 MB. Run chmod +x GraphPulse.AppImage after download.',
             'gp.dl.more': 'Download →',
+            'prod.4.tag': '04 · Editor',
+            'prod.4.desc': 'A VSCode extension: syntax highlighting, LSP IntelliSense, live validation and an AST viewer, tailor-made for Bruker .pp files.',
+            'bp.head': 'VSCode Extension',
+            'bp.sub': 'A modern editing experience tailor-made for Bruker .pp pulse programs',
+            'bp.title': '<em>Bruker PP</em>: IDE-grade editing for .pp files',
+            'bp.desc': 'Full Bruker pulse-program development support in VSCode: TextMate syntax highlighting, LSP IntelliSense, Lark parser validation, an AST viewer and 30+ snippets.',
+            'bp.1': 'Syntax highlighting: based on the full EBNF grammar, covering pulses, delays, phases, gradients, decoupling and every other element',
+            'bp.2': 'LSP IntelliSense: hover docs, auto-completion, go-to-definition, find references, rename and semantic tokens',
+            'bp.3': 'Live validation: Lark Earley parser validates character-by-character, with line/column-accurate errors and Chinese messages',
+            'bp.4': 'AST viewer: one-click parse into an abstract syntax tree, output as formatted JSON',
+            'bp.5': '30+ snippets: calc, ph, pg, go, mc, lo, gron/groff and other common patterns at your fingertips',
+            'bp.6': 'Auto-completion: p0-p63, d0-d63, ph0-ph31, channel modifiers and user-defined symbols from the current file',
+            'bp.github': 'View on GitHub',
+            'bp.nofilm': 'Your browser cannot play this video. <a href="media/bruker-pp-promo.mp4">Download it instead</a>.',
+            'bp.cap': 'Bruker Pulse Program trailer: syntax highlighting, LSP IntelliSense, live validation and AST visualization',
             'mod.title': 'Models & <em>Datasets</em>',
             'mod.sub': 'Browse my models and datasets on ModelScope and Hugging Face',
             'mod.visit': 'Visit profile →',
             'cta.title': 'Make NMR pulse sequence research more efficient',
             'cta.desc': 'A complete workflow from experiment description to executable pulse programs, physics-simulation checks and visualization',
-            'ft.about': 'NMRagent (AI pulse-sequence generation), nmrsimpy (pulse-program simulation) and GraphPulse (TopSpin-style visualization), from NMR research in the Xue Yi Lab at Tsinghua University.',
+            'ft.about': 'NMRagent (AI pulse-sequence generation), nmrsimpy (pulse-program simulation), GraphPulse (TopSpin-style visualization) and Bruker PP (VSCode editor), from NMR research in the Xue Yi Lab at Tsinghua University.',
             'ft.products': 'Products', 'ft.community': 'Community', 'ft.contact': 'Contact',
             'ft.email': 'Email Us', 'ft.home': 'Homepage', 'ft.lab': 'Xue Yi Lab, Tsinghua University'
         };

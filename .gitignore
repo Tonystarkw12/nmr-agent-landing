@@ -33,3 +33,8 @@ Thumbs.db
 *.log
 *.pid
 *.status
+
+# Binaries & installers
+*.dmg
+*.msi
+*.AppImage
